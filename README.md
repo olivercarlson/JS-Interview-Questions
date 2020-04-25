@@ -76,7 +76,8 @@ function renderMessage (message) {
 
 // global scope
 for (var i = 0; i < 5; i++) {
-  renderMessage(i)              // the key here is to to wrap each individual value of i within each function call's protective scope ( aka create a closure ).
+  renderMessage(i)              
+  // the key here is to to wrap each individual value of i within each function call's protective scope ( aka create a closure ).
 }
 ```
 
@@ -193,6 +194,8 @@ in some <Parent> component:
     }
 ```
 
+Now let's try to update this:
+
 ```
 in some <Child> component:
     this.state = undefined; // to be explicit, we have no state here.
@@ -203,10 +206,11 @@ in some <Child> component:
     }
 ```
 
-In order to allow some <Child> component update our <Parent> state, we need a closure! (which in the case of React, we would pass down and access it via props.
+In order to allow some Child component update our Parent state, we need a closure! (which in the case of React, we would pass down and access it via props.
     
 ```
 in some <Parent> component: 
+
     ..
     
     this.state = {
@@ -220,18 +224,15 @@ in some <Parent> component:
     
     render() {
         return (
-            <Child setCount={updateCount} />   // pass in the updateCount which has a closure around the Parent's setState 
+            <Child setCount={updateCount} />   
+            // pass in the updateCount which has a closure around the Parent's setState 
         )
     }
 ```
-
-Now in <Child>, by the magic of closures, we can call (and access the scope of) the Parent's setState value. 
-
-```
-  handleClick = () => event => {
-         this.props.setCount(event.target.value)
-    }
-
-```
-
 And voila! We have utilized the power of closures to encapsulate a variable.
+
+```
+Now in <Child>, by the magic of closures, we can call (and access the scope of) the Parent's setState value. 
+handleClick = () => event => {
+         this.props.setCount(event.target.value)}
+```
