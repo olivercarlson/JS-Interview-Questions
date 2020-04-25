@@ -234,3 +234,4 @@ Now in <Child>, by the magic of closures, we can call (and access the scope of) 
 
 ```
 
+And voila! We have utilized the power of closures to encapsulate a variable.
