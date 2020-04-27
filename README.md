@@ -67,7 +67,7 @@ This will probably be considered cheating, but you can of course skip all the wa
 ```
 for (let i = 0; i < 5; i++) {
     setTimeout(function() {
-        console.log(i)   
+        console.log(i)    // 0,1,2,3,4
     }, 1000)
 }
 ```
