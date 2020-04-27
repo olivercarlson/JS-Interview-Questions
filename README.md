@@ -1,11 +1,20 @@
 # JS-Interview-Questions
 A Repository that goes beyond explanations & solutions to common JS Interview Questions by explaining WHY they are asking the question.
 
-Questions will be broken down by 1. The Question 2. Modifications to Stop and Think About, 3. What the question is intending to test / why they are asking this, 4. A Solution, and finally 5. Further Reading  
+Questions will be broken down by:
+1. The Question 
+
+2. Stop and Think Sections
+
+3. Understanding what the question is intending to test and why they are asking this
+
+4. A Solution
+
+5. Further Reading  
 
 # 1. Closures
 
-A typical example of this question is something along the lines of "what is the output of this code?" possibly followed by,
+A typical example of this question is something along the lines of "what is the output of this code?" followed by,
 "how do you fix it?" 
 
 ```
@@ -15,6 +24,7 @@ for (var i = 0; i < 5; i++) {
   }, 1000);                 
 }
 ```
+
 ### Questions to ask yourself first:
 Consider the output of these two similar blocks of code:
 
@@ -34,21 +44,21 @@ for (var i = 0; i < 5; i++) {
 
 ### What is this question intending to test?
 
-This question is intended to test your knowledge of closures in JavaScript. 
+Typically, this question is intended to test your knowledge of closures in JavaScript. 
     
-It may be unintentionally testing:
+It may be also be intentionally or unintentionally testing:
 
 - If you're used to ES2015's let & const, it may be testing whether or not you remember the lexical scoping rules of var. 
 
 - If you understand the Event Loop in JavaScript (a setTimeout of even 0 will pop us at the back of the message queue!)
 
-- If you understand Pass By Reference and Pass By Value in function calls.
+- If you understand the difference between Pass By Reference and Pass By Value in function calls.
         
 ### Why am I being asked this?
 
-It's important to remember that before ES2015 JavaScript had no block level scoping. Thus the necessity of understanding a simple closure was extremely important. 
+Before ES2015 JavaScript had no block level scoping. Thus the necessity of understanding a simple closure was extremely important - this was essentially a bread and butter pattern to know.
     
-A common task could be say looping over an array [1,2,3,4,5] and inserting several buttons to the DOM with an event handler and text equal to 'i' in the loop. 
+A common task could be say looping over an array [1,2,3,4,5] and inserting several buttons to the DOM with an event handler and text equal to the value of 'i' in the loop. 
     
 ### Solution:
 
@@ -65,65 +75,148 @@ for (let i = 0; i < 5; i++) {
 A possible var based solution could look like this:
 
 ```
-// global scope 
 function renderMessage (message) {
-    // renderMessage function scope
-  
+// renderMessage function scope, value of message is equal to whatever was passed in when the function was called.
   setTimeout(function() {
     console.log(message)
   }, 1000)
 }
 
-// global scope
 for (var i = 0; i < 5; i++) {
+//global scope (for anything that references the value of i)
   renderMessage(i)              
-  // the key here is to to wrap each individual value of i within each function call's protective scope ( aka create a closure ).
 }
 ```
 
-In order to understand why this occurs, we need to look a bit deeper as to what's going on.
+A key piece of the solution here is that **each time** we call the renderMessage function, we are encapsulating each reference to i within each call of that function's lexical environment.
 
-If we take a look at the function call stack for our code:
+This lexical environment is determined (and fixed) when we call the function (and **not** when we execute it or any remaining code associated with it).
+
+In our loop example, we're creating 5 different, unique lexical environments each of which contain a different value of i.  
+
+It is a summation of both the lexical scoping rules of var (no block level scope) and the Event Loop triggering a new message from setTimeout that is leading us to this behavior. 
+
+I think it is important to stop and consider additional blocks of code.
+
+Calling a separate function **without a set timeout** either within the for loop block or outside of it:
 
 ```
-in loop i = 0;
+function immediateMessage(message) {
+    console.log(message)
+}
 
-call function renderMessage(i = 0);
-
-function renderMessage(i = 0) fires and when the setTimeout for 1000ms expires, add a new message to queue in the event loop to console.log the value of i.
-
-..
-
-..
-
-..
-
-loop i = 4;
-
-call function renderMessage(i = 4);
-
-function renderMessage(i = 4) fires a timer (to be handled elsewhere) is set for 1000ms and when it expires, add a new message to queue in the event loop to console.log the value of i.
-
-// break loop, i == 5;
-
-// end of the current function call stack.
-
-// we can now move on to the next message in queue at the event loop, of which there are 5, one for each console.log
-
-console.log(i = 0);
-
-..
-
-..
-
-..
-
-console.log(i = 4);
+for (var i = 0; i < 5; i++) {
+    immediateMessage(i)         // 0,1,2,3,4
+}
 ```
+
+The same output is repeated here: 
+
+``` 
+for (var i = 0; i < 5; i++) {
+    function immediateMessage(message) {
+        console.log(message)
+        }
+    
+    immediateMessage(i)         // 0,1,2,3,4
+}
+```
+
+In a sort of contrived example, we can try adding additional function calls to the current function's call stack, and return
+the same result as before:
+
+```
+for (var i = 0; i < 5; i++) {
+  a(i)
+}
+
+function a (x) {
+  b(x)
+}
+
+function b(y) {
+  immediateMessage(y)
+}
+
+function immediateMessage(z) {
+  console.log(z)         // 0,1,2,3,4
+}
+```
+
+All three of these examples rely on a **single message in the Event Loop** generating new function calls within the current call stack and thus reference the "correct" value of i. 
+
+To illustrate this more explicitly using the above scenario:
+
+```
+// Each Message is an item in the queue of the Event Loop 
+
+
+
+{Message 1:
+for loop (i = 0): //Global scope:  i = 0;
+a calls b with value i = 0;
+c calls immediateMessage with value i = 0;
+immediateMessage console.logs the value of i;
+
+for loop (i = 1): // Global scope: i = 1;
+
+..
+
+..
+
+..
+
+end of Message 1}
+
+// Note: We only have one message here.
+```
+
+However, when we add the setTimeout, we are new pushing each function call to a new message. 
+
+Illustrated below:
+
+```
+for (i = 0; i < 5; i++) {
+    setTimeout(function() {
+        console.log(i)    
+    }, 1000)
+}
+
+{Message 1:
+for loop (i = 0):                           //Global scope:  i = 0;
+// a new event listener is registered, when the timeout expires after at least 1000 ms has passed, a console.log will display whatever i references.
+
+..
+..
+..
+
+for loop (i = 4):             //Global scope:  i = 4;
+// a new event listener is registered, when the timeout expires after at least 1000 ms has passed, a console.log will display whatever i references.
+
+// i = 5;  // global scope
+// break loop;
+//end of Message 1}
+
+{ Message 2:
+console.log the value that i references (right now!)
+// returns 5
+// end of Message 2}
+
+{ Message 3:
+console.log the value that i references (right now!)
+// returns 5
+// end of Message 3}
+
+..
+..
+..
+
+```
+
 
 Thus far, we have covered the importance of 1. Closures and 2. The Event Loop.   
 
-It's important to note that, there is one final toppic that is important to recognize, the difference between a function call by reference and by value.
+There is one final topic that is also important to highlight, the difference between a function call by reference and by value.
 
 The key reason our initial example failed was because in that setTimeout, we are not passing the value of i but we are instead passing a reference to the value of i (which can change).
 
@@ -167,13 +260,15 @@ loop i = 4;
 // go to the next message in queue in the event loop
 // where we passed a console.log with a reference to i.
 
+```
+
 It is extremely important to remember one of the reasons why this error occurred in the first place is because we were talking about what i was referencing. 
 
 # Modern Day Examples: 
 
-Closures:
+More realistically, you will be working with a frontend framework or library such as React which thankfully use a combination of Babel and polyfills to allow developers to write code with cutting edge syntax. 
 
-More realistically, you will be working with a frontend framework / library such as React which thankfully use Babel and polyfills to allow developers to write cutting edge syntax. Therefore, we will have variable declarations with let available. However, we will still need to be aware of closures.
+Therefore, we will have variable declarations with let available. However, we will still need to be aware of closures.
 
 Consider this standard code in React:
 
@@ -208,11 +303,9 @@ in some <Child> component:
 
 In order to allow some Child component update our Parent state, we need a closure! (which in the case of React, we would pass down and access it via props.
     
-```
+``` 
 in some <Parent> component: 
 
-    ..
-    
     this.state = {
         count: 1
     }
@@ -229,10 +322,12 @@ in some <Parent> component:
         )
     }
 ```
+
 And voila! We have utilized the power of closures to encapsulate a variable.
 
-```
 Now in <Child>, by the magic of closures, we can call (and access the scope of) the Parent's setState value. 
+    
+```
 handleClick = () => event => {
          this.props.setCount(event.target.value)}
 ```
