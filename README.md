@@ -28,13 +28,13 @@ for (var i = 0; i < 5; i++) {
 ### Questions to ask yourself first:
 Consider the output of these two similar blocks of code:
 
-```
+```javascript
 for (var i = 0; i < 5; i++) {
     console.log(i);
 }
 ```
 
-```
+```javascript
 for (var i = 0; i < 5; i++) {
   setTimeout(function() {
     console.log(i);
