@@ -154,9 +154,9 @@ To illustrate this more explicitly using the above scenario:
 
 {Message 1:
 for loop (i = 0): //Global scope:  i = 0;
-a calls b with value i = 0;
-c calls immediateMessage with value i = 0;
-immediateMessage console.logs the value of i;
+// a calls b with value i = 0;
+// c calls immediateMessage with value i = 0;
+// immediateMessage console.logs the value of i;
 
 for loop (i = 1): // Global scope: i = 1;
 
@@ -191,7 +191,7 @@ for loop (i = 0):                           //Global scope:  i = 0;
 ..
 
 for loop (i = 4):             //Global scope:  i = 4;
-// a new event listener is registered, when the timeout expires after at least 1000 ms has passed, a console.log will display whatever i references.
+// a new event listener is registered, when the timeout expires after at least 1000 ms has passed, a console.log will // display whatever i references.
 
 // i = 5;  // global scope
 // break loop;
@@ -239,7 +239,7 @@ To look back at the function call stack and event loop for this block of code WI
 ```javascript
 in loop i = 0;
 
-call function renderMessage(i); 
+// call function renderMessage(i); 
 
 function renderMessage(i) fires and when the setTimeout for 1000ms expires, add a new message to queue in the event loop to console.log the value of i. 
 
@@ -273,7 +273,7 @@ Therefore, we will have variable declarations with let available. However, we wi
 Consider this standard code in React:
 
 ```javascript
-in some <Parent> component: 
+//in some <Parent> component: 
     ..
     
     this.state = {
@@ -292,7 +292,7 @@ in some <Parent> component:
 Now let's try to update this:
 
 ```javascript
-in some <Child> component:
+//in some <Child> component:
     this.state = undefined; // to be explicit, we have no state here.
     
     // in some on click event handler:
@@ -304,7 +304,7 @@ in some <Child> component:
 In order to allow some Child component update our Parent state, we need a closure! (which in the case of React, we would pass down and access it via props.
     
 ```javascript 
-in some <Parent> component: 
+//in some <Parent> component: 
 
     this.state = {
         count: 1
