@@ -17,7 +17,7 @@ Questions will be broken down by:
 A typical example of this question is something along the lines of "what is the output of this code?" followed by,
 "how do you fix it?" 
 
-```
+```javascript
 for (var i = 0; i < 5; i++) {
   setTimeout(function() {
     console.log(i);
@@ -64,7 +64,7 @@ A common task could be say looping over an array [1,2,3,4,5] and inserting sever
 
 This will probably be considered cheating, but you can of course skip all the waffle and just use ES2015 features:
 
-```
+```javascript
 for (let i = 0; i < 5; i++) {
     setTimeout(function() {
         console.log(i)    // 0,1,2,3,4
@@ -74,7 +74,7 @@ for (let i = 0; i < 5; i++) {
 
 A possible var based solution could look like this:
 
-```
+```javascript
 function renderMessage (message) {
 // renderMessage function scope, value of message is equal to whatever was passed in when the function was called.
   setTimeout(function() {
@@ -100,7 +100,7 @@ I think it is important to stop and consider additional blocks of code.
 
 Calling a separate function **without a set timeout** either within the for loop block or outside of it:
 
-```
+```javascript
 function immediateMessage(message) {
     console.log(message)
 }
@@ -112,7 +112,7 @@ for (var i = 0; i < 5; i++) {
 
 The same output is repeated here: 
 
-``` 
+```javascript 
 for (var i = 0; i < 5; i++) {
     function immediateMessage(message) {
         console.log(message)
@@ -125,7 +125,7 @@ for (var i = 0; i < 5; i++) {
 In a sort of contrived example, we can try adding additional function calls to the current function's call stack, and return
 the same result as before:
 
-```
+```javascript
 for (var i = 0; i < 5; i++) {
   a(i)
 }
@@ -147,7 +147,7 @@ All three of these examples rely on a **single message in the Event Loop** gener
 
 To illustrate this more explicitly using the above scenario:
 
-```
+```javascript
 // Each Message is an item in the queue of the Event Loop 
 
 
@@ -175,7 +175,7 @@ However, when we add the setTimeout, we are new pushing each function call to a 
 
 Illustrated below:
 
-```
+```javascript
 for (i = 0; i < 5; i++) {
     setTimeout(function() {
         console.log(i)    
@@ -222,7 +222,7 @@ The key reason our initial example failed was because in that setTimeout, we are
 
 Let's review the code again:
 
-```
+```javascript
 // becase we are using var, this for loop brace "{" does not have it's own lexical scope.
 // so essentially we are delcaring out here, in the global scope:
 // var i = 0;
@@ -236,7 +236,7 @@ for (var i = 0; i < 5; i++) {
 
 To look back at the function call stack and event loop for this block of code WITHOUT using a function to wrap a closure around the value of i:
 
-```
+```javascript
 in loop i = 0;
 
 call function renderMessage(i); 
@@ -272,7 +272,7 @@ Therefore, we will have variable declarations with let available. However, we wi
 
 Consider this standard code in React:
 
-```
+```javascript
 in some <Parent> component: 
     ..
     
@@ -291,7 +291,7 @@ in some <Parent> component:
 
 Now let's try to update this:
 
-```
+```javascript
 in some <Child> component:
     this.state = undefined; // to be explicit, we have no state here.
     
@@ -303,7 +303,7 @@ in some <Child> component:
 
 In order to allow some Child component update our Parent state, we need a closure! (which in the case of React, we would pass down and access it via props.
     
-``` 
+```javascript 
 in some <Parent> component: 
 
     this.state = {
@@ -327,7 +327,7 @@ And voila! We have utilized the power of closures to encapsulate a variable.
 
 Now in <Child>, by the magic of closures, we can call (and access the scope of) the Parent's setState value. 
     
-```
+```javascript
 handleClick = () => event => {
          this.props.setCount(event.target.value)}
 ```
